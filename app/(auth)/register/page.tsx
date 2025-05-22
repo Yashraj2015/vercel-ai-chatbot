@@ -2,19 +2,22 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useActionState, useEffect, useState } from 'react';
-
-import { AuthForm } from '@/components/auth-form';
-import { SubmitButton } from '@/components/submit-button';
-
-import { register, type RegisterActionState } from '../actions';
+import { useActionState, useEffect, useState, useRef } from 'react';
 import { toast } from '@/components/toast';
+import ReCAPTCHA from 'react-google-recaptcha';
+import { AuthForm } from '@/components/auth-form';
+import { SubmitButton } from '@/components/submit-buttons';
+import { register, type RegisterActionState } from '../actions';
+import img from '../../../public/images/banner.png'
+import Image from 'next/image'
 
 export default function Page() {
   const router = useRouter();
-
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
   const [email, setEmail] = useState('');
   const [isSuccessful, setIsSuccessful] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
   const [state, formAction] = useActionState<RegisterActionState, FormData>(
     register,
@@ -23,40 +26,88 @@ export default function Page() {
     },
   );
 
+  const handleRecaptchaChange = (token: string | null) => {
+    setRecaptchaToken(token);
+    setIsButtonDisabled(!token);
+  };
+
+  const resetRecaptcha = () => {
+    if (recaptchaRef.current) {
+      recaptchaRef.current.reset();
+      setRecaptchaToken(null);
+      setIsButtonDisabled(true);
+    }
+  };
+
+  const handleSubmit = (formData: FormData) => {
+    if (!recaptchaToken) {
+      toast({ type: 'error', description: 'Please complete the reCAPTCHA!' });
+      return;
+    }
+
+    formData.append('recaptchaToken', recaptchaToken);
+    setEmail(formData.get('email') as string);
+    formAction(formData);
+  };
+
   useEffect(() => {
     if (state.status === 'user_exists') {
       toast({ type: 'error', description: 'Account already exists!' });
+      resetRecaptcha();
     } else if (state.status === 'failed') {
       toast({ type: 'error', description: 'Failed to create account!' });
+      resetRecaptcha();
     } else if (state.status === 'invalid_data') {
       toast({
         type: 'error',
         description: 'Failed validating your submission!',
       });
+      resetRecaptcha();
+    } else if (state.status === 'recaptcha_failed') {
+      toast({ type: 'error', description: 'reCAPTCHA verification failed!' });
+      resetRecaptcha();
     } else if (state.status === 'success') {
       toast({ type: 'success', description: 'Account created successfully!' });
-
       setIsSuccessful(true);
       router.refresh();
     }
-  }, [state]);
-
-  const handleSubmit = (formData: FormData) => {
-    setEmail(formData.get('email') as string);
-    formAction(formData);
-  };
+  }, [state, router]);
 
   return (
     <div className="flex h-dvh w-screen items-start pt-12 md:pt-0 md:items-center justify-center bg-background">
-      <div className="w-full max-w-md overflow-hidden rounded-2xl gap-12 flex flex-col">
-        <div className="flex flex-col items-center justify-center gap-2 px-4 text-center sm:px-16">
+      <div className='absolute top-16 '>
+        <Image src={img} alt='' width={150} />
+      </div>
+      <div className="w-full max-w-md overflow-hidden rounded-[50px] flex flex-col  gap-12 bg-zinc-900 pt-12 pb-8 px-7 md:px-1 ">
+        {/* <div className="flex flex-col items-center justify-center gap-2 px-4 text-center sm:px-16">
           <h3 className="text-xl font-semibold dark:text-zinc-50">Sign Up</h3>
           <p className="text-sm text-gray-500 dark:text-zinc-400">
             Create an account with your email and password
           </p>
-        </div>
+        </div> */}
         <AuthForm action={handleSubmit} defaultEmail={email}>
-          <SubmitButton isSuccessful={isSuccessful}>Sign Up</SubmitButton>
+          <div className="flex flex-col gap-4 ">
+            <ReCAPTCHA
+              className='mt-3 ml-1'
+              ref={recaptchaRef}
+              sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+              onChange={handleRecaptchaChange}
+              onExpired={() => {
+                setRecaptchaToken(null);
+                setIsButtonDisabled(true);
+              }}
+              onErrored={() => {
+                setRecaptchaToken(null);
+                setIsButtonDisabled(true);
+              }}
+            />
+            <SubmitButton 
+              isSuccessful={isSuccessful}
+              disabled={isButtonDisabled}
+            >
+              Sign Up
+            </SubmitButton>
+          </div>
           <p className="text-center text-sm text-gray-600 mt-4 dark:text-zinc-400">
             {'Already have an account? '}
             <Link

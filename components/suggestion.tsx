@@ -6,6 +6,8 @@ import { useWindowSize } from 'usehooks-ts';
 
 import type { UISuggestion } from '@/lib/editor/suggestions';
 
+import img from '../public/images/logo.png'
+import Image from 'next/image';
 import { CrossIcon, MessageIcon } from './icons';
 import { Button } from './ui/button';
 import { cn } from '@/lib/utils';
@@ -50,8 +52,9 @@ export const Suggestion = ({
         >
           <div className="flex flex-row items-center justify-between">
             <div className="flex flex-row items-center gap-2">
-              <div className="size-4 bg-muted-foreground/25 rounded-full" />
-              <div className="font-medium">Assistant</div>
+              <Image src={img} alt='' width='24' className='my-1'/>
+              {/* <div className="size-4 bg-muted-foreground/25 rounded-full" /> */}
+              <div className="font-medium">Srushti</div>
             </div>
             <button
               type="button"

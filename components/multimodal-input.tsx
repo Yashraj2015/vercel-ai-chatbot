@@ -15,7 +15,7 @@ import {
 } from 'react';
 import { toast } from 'sonner';
 import { useLocalStorage, useWindowSize } from 'usehooks-ts';
-
+import { Mic } from 'lucide-react';
 import { ArrowUpIcon, PaperclipIcon, StopIcon } from './icons';
 import { PreviewAttachment } from './preview-attachment';
 import { Button } from './ui/button';
@@ -53,6 +53,65 @@ function PureMultimodalInput({
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
+  const [isRecording, setIsRecording] = useState(false);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+
+        recognition.onresult = (event) => {
+          const transcript = Array.from(event.results)
+            .map((result) => result[0])
+            .map((result) => result.transcript)
+            .join('');
+          setInput(transcript);
+          adjustHeight();
+        };
+
+        recognition.onerror = (event) => {
+          console.error('Speech recognition error', event.error);
+          setIsRecording(false);
+          toast.error('Speech recognition error: ' + event.error);
+        };
+
+        recognitionRef.current = recognition;
+      } else {
+        toast.error('Speech recognition not supported in your browser');
+      }
+    }
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, [setInput]);
+
+  const toggleRecording = () => {
+    if (!recognitionRef.current) {
+      toast.error('Speech recognition not available');
+      return;
+    }
+
+    if (isRecording) {
+      recognitionRef.current.stop();
+      setIsRecording(false);
+    } else {
+      try {
+        recognitionRef.current.start();
+        setIsRecording(true);
+      } catch (error) {
+        console.error('Error starting speech recognition:', error);
+        toast.error('Error starting microphone');
+      }
+    }
+  };
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -180,7 +239,7 @@ function PureMultimodalInput({
   );
 
   return (
-    <div className="relative w-full flex flex-col gap-4">
+    <div className="relative w-full flex flex-col gap-4 mb-4 md:px-0 px-4">
       {messages.length === 0 &&
         attachments.length === 0 &&
         uploadQueue.length === 0 && (
@@ -222,11 +281,11 @@ function PureMultimodalInput({
       <Textarea
         data-testid="multimodal-input"
         ref={textareaRef}
-        placeholder="Send a message..."
+        placeholder="Ask Srushti"
         value={input}
         onChange={handleInput}
         className={cx(
-          'min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-2xl !text-base bg-muted pb-10 dark:border-zinc-700',
+          'min-h-[120px] max-h-[calc(75dvh)] shadow-xl overflow-hidden resize-none rounded-3xl p-4 !text-base font-medium bg-[#404045] pb-[55px] dark:border-zinc-700',
           className,
         )}
         rows={2}
@@ -252,15 +311,42 @@ function PureMultimodalInput({
         <AttachmentsButton fileInputRef={fileInputRef} status={status} />
       </div>
 
-      <div className="absolute bottom-0 right-0 p-2 w-fit flex flex-row justify-end">
-        {status === 'submitted' ? (
-          <StopButton stop={stop} setMessages={setMessages} />
+      <div className="absolute bottom-0 right-0 p-2 w-fit flex flex-row justify-end gap-2">
+        {input.length > 0 ? (
+          <>
+            <Button
+              data-testid="mic-button"
+              className={`rounded-full p-2 h-fit  border dark:border-zinc-500 ${isRecording ? 'bg-red-500' : ''}`}
+              onClick={(event) => {
+                event.preventDefault();
+                toggleRecording();
+              }}
+              variant={isRecording ? 'destructive' : 'ghost'}
+            >
+              <Mic size={14} />
+            </Button>
+            {status === 'submitted' ? (
+              <StopButton stop={stop} setMessages={setMessages} />
+            ) : (
+              <SendButton
+                input={input}
+                submitForm={submitForm}
+                uploadQueue={uploadQueue}
+              />
+            )}
+          </>
         ) : (
-          <SendButton
-            input={input}
-            submitForm={submitForm}
-            uploadQueue={uploadQueue}
-          />
+          <Button
+            data-testid="mic-button"
+            className={`rounded-full md:mr-0 mr-4 p-2 h-fit border dark:border-zinc-500 ${isRecording ? 'bg-red-500' : ''}`}
+            onClick={(event) => {
+              event.preventDefault();
+              toggleRecording();
+            }}
+            variant={isRecording ? 'destructive' : 'ghost'}
+          >
+            <Mic size={14} />
+          </Button>
         )}
       </div>
     </div>
@@ -288,7 +374,7 @@ function PureAttachmentsButton({
   return (
     <Button
       data-testid="attachments-button"
-      className="rounded-md rounded-bl-lg p-[7px] h-fit dark:border-zinc-700 hover:dark:bg-zinc-900 hover:bg-zinc-200"
+      className="rounded-full border p-2 h-fit dark:border-zinc-500 hover:dark:bg-zinc-900/40 "
       onClick={(event) => {
         event.preventDefault();
         fileInputRef.current?.click();
@@ -296,7 +382,7 @@ function PureAttachmentsButton({
       disabled={status !== 'ready'}
       variant="ghost"
     >
-      <PaperclipIcon size={14} />
+      <PaperclipIcon size={18} />
     </Button>
   );
 }
@@ -313,7 +399,7 @@ function PureStopButton({
   return (
     <Button
       data-testid="stop-button"
-      className="rounded-full p-1.5 h-fit border dark:border-zinc-600"
+      className="rounded-full p-2 h-fit border dark:border-zinc-600"
       onClick={(event) => {
         event.preventDefault();
         stop();
@@ -339,7 +425,7 @@ function PureSendButton({
   return (
     <Button
       data-testid="send-button"
-      className="rounded-full p-1.5 h-fit border dark:border-zinc-600"
+      className="rounded-full p-2 h-fit md:mr-0 mr-4 border dark:border-zinc-600"
       onClick={(event) => {
         event.preventDefault();
         submitForm();

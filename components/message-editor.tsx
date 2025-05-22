@@ -48,15 +48,15 @@ export function MessageEditor({
       <Textarea
         data-testid="message-editor"
         ref={textareaRef}
-        className="bg-transparent outline-none overflow-hidden resize-none !text-base rounded-xl w-full"
+        className="bg-[#404045] outline-none overflow-hidden resize-none !text-base rounded-2xl w-full"
         value={draftContent}
         onChange={handleInput}
       />
 
-      <div className="flex flex-row gap-2 justify-end">
+      <div className="flex flex-row gap-2 justify-end ">
         <Button
           variant="outline"
-          className="h-fit py-2 px-3"
+          className="h-fit py-2 px-3 rounded-xl"
           onClick={() => {
             setMode('view');
           }}
@@ -66,7 +66,7 @@ export function MessageEditor({
         <Button
           data-testid="message-editor-send-button"
           variant="default"
-          className="h-fit py-2 px-3"
+          className="h-fit py-2 px-3 rounded-xl"
           disabled={isSubmitting}
           onClick={async () => {
             setIsSubmitting(true);

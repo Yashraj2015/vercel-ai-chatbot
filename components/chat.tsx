@@ -66,7 +66,7 @@ export function Chat({
 
   return (
     <>
-      <div className="flex flex-col min-w-0 h-dvh bg-background">
+      <div className="flex flex-col min-w-0 h-dvh bg-[#292a2d] ">
         <ChatHeader
           chatId={id}
           selectedModelId={selectedChatModel}
@@ -85,7 +85,7 @@ export function Chat({
           isArtifactVisible={isArtifactVisible}
         />
 
-        <form className="flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl">
+        <form className="flex mx-auto pt-0 flex-col pb-2 md:pb-2 w-full md:max-w-3xl">
           {!isReadonly && (
             <MultimodalInput
               chatId={id}
@@ -101,7 +101,9 @@ export function Chat({
               append={append}
             />
           )}
+          <p className='items-center justify-center mx-auto text-xs text-gray-500'>Please verify crucial info.</p>
         </form>
+        
       </div>
 
       <Artifact

@@ -278,7 +278,7 @@ function PureArtifact({
 
           {!isMobile && (
             <motion.div
-              className="relative w-[400px] bg-muted dark:bg-background h-dvh shrink-0"
+              className="relative w-[600px] bg-muted dark:bg-[#292a2d] h-dvh shrink-0"
               initial={{ opacity: 0, x: 10, scale: 1 }}
               animate={{
                 opacity: 1,
@@ -381,11 +381,11 @@ function PureArtifact({
                   }
                 : {
                     opacity: 1,
-                    x: 400,
+                    x: 600,
                     y: 0,
                     height: windowHeight,
                     width: windowWidth
-                      ? windowWidth - 400
+                      ? windowWidth - 600
                       : 'calc(100dvw-400px)',
                     borderRadius: 0,
                     transition: {

@@ -20,8 +20,7 @@ export function SidebarToggle({
       <TooltipTrigger asChild>
         <Button
           onClick={toggleSidebar}
-          variant="outline"
-          className="md:px-2 md:h-fit"
+          className="md:p-[10px] md:h-fit bg-transparent text-white hover:bg-zinc-700/40 rounded-lg"
         >
           <SidebarLeftIcon size={16} />
         </Button>

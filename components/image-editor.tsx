@@ -25,12 +25,14 @@ export function ImageEditor({
     >
       {status === 'streaming' ? (
         <div className="flex flex-row gap-4 items-center">
-          {!isInline && (
+          {/* {!isInline && (
             <div className="animate-spin">
               <LoaderIcon />
             </div>
-          )}
-          <div>Generating Image...</div>
+          )} */}
+          <div className="animate-spin">
+            <LoaderIcon />
+          </div>
         </div>
       ) : (
         <picture>

@@ -13,9 +13,9 @@ interface SuggestedActionsProps {
 function PureSuggestedActions({ chatId, append }: SuggestedActionsProps) {
   const suggestedActions = [
     {
-      title: 'What are the advantages',
-      label: 'of using Next.js?',
-      action: 'What are the advantages of using Next.js?',
+      title: 'What is the weather',
+      label: 'in San Francisco?',
+      action: 'What is the weather in San Francisco?',
     },
     {
       title: 'Write code to',
@@ -27,17 +27,13 @@ function PureSuggestedActions({ chatId, append }: SuggestedActionsProps) {
       label: `about silicon valley`,
       action: `Help me write an essay about silicon valley`,
     },
-    {
-      title: 'What is the weather',
-      label: 'in San Francisco?',
-      action: 'What is the weather in San Francisco?',
-    },
+    
   ];
 
   return (
     <div
       data-testid="suggested-actions"
-      className="grid sm:grid-cols-2 gap-2 w-full"
+      className="grid  md:grid-cols-4 md:px-0 px-10 grid-cols-2 gap-2 mt-8 w-full bg-transparent "
     >
       {suggestedActions.map((suggestedAction, index) => (
         <motion.div
@@ -46,7 +42,7 @@ function PureSuggestedActions({ chatId, append }: SuggestedActionsProps) {
           exit={{ opacity: 0, y: 20 }}
           transition={{ delay: 0.05 * index }}
           key={`suggested-action-${suggestedAction.title}-${index}`}
-          className={index > 1 ? 'hidden sm:block' : 'block'}
+          className={index === 2 ? 'hidden md:block' : 'block'}
         >
           <Button
             variant="ghost"
@@ -58,15 +54,14 @@ function PureSuggestedActions({ chatId, append }: SuggestedActionsProps) {
                 content: suggestedAction.action,
               });
             }}
-            className="text-left border rounded-xl px-4 py-3.5 text-sm flex-1 gap-1 sm:flex-col w-full h-auto justify-start items-start"
+            className="text-left border rounded-2xl md:mx-20 px-3 py-3.5 text-sm flex-1 bg-zinc-600/20 gap-1 sm:flex-col  w-full h-auto justify-start items-start hover:bg-zinc-700/20"
           >
-            <span className="font-medium">{suggestedAction.title}</span>
-            <span className="text-muted-foreground">
-              {suggestedAction.label}
-            </span>
+            <span className="font-medium truncate">{suggestedAction.title}</span>
+  
           </Button>
         </motion.div>
       ))}
+
     </div>
   );
 }

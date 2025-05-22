@@ -5,15 +5,35 @@ import { z } from 'zod';
 import { auth } from '@/app/(auth)/auth';
 
 // Use Blob instead of File since File is not available in Node.js environment
+// const FileSchema = z.object({
+//   file: z
+//     .instanceof(Blob)
+//     .refine((file) => file.size <= 5 * 1024 * 1024, {
+//       message: 'File size should be less than 5MB',
+//     })
+//     // Update the file type based on the kind of files you want to accept
+//     .refine((file) => ['image/jpeg', 'image/png'].includes(file.type), {
+//       message: 'File type should be JPEG or PNG',
+//     }),
+// });
+
 const FileSchema = z.object({
   file: z
     .instanceof(Blob)
     .refine((file) => file.size <= 5 * 1024 * 1024, {
       message: 'File size should be less than 5MB',
     })
-    // Update the file type based on the kind of files you want to accept
-    .refine((file) => ['image/jpeg', 'image/png'].includes(file.type), {
-      message: 'File type should be JPEG or PNG',
+    .refine((file) => {
+      const fileName = (file as unknown as File).name || '';
+      return !fileName.toLowerCase().endsWith('.docx');
+    }, {
+      message: 'Sorry, .docx file is not allowed. You can convert it to .pdf or .txt file and try again.',
+    })
+    .refine((file) => {
+      const fileName = (file as unknown as File).name || '';
+      return !fileName.toLowerCase().endsWith('.mp4');
+    }, {
+      message: 'Sorry, file type not allowed.',
     }),
 });
 

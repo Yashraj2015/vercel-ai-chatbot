@@ -22,10 +22,10 @@ export const PreviewAttachment = ({
               key={url}
               src={url}
               alt={name ?? 'An image attachment'}
-              className="rounded-md size-full object-cover"
+              className="rounded-xl size-full object-cover"
             />
           ) : (
-            <div className="" />
+            <div className="text-xs text-zinc-500 max-w-16 truncate">{name}</div>
           )
         ) : (
           <div className="" />
@@ -40,7 +40,7 @@ export const PreviewAttachment = ({
           </div>
         )}
       </div>
-      <div className="text-xs text-zinc-500 max-w-16 truncate">{name}</div>
+      {/* <div className="text-xs text-zinc-500 max-w-16 truncate">{name}</div> */}
     </div>
   );
 };

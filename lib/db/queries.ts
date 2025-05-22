@@ -46,6 +46,8 @@ export async function getUser(email: string): Promise<Array<User>> {
   }
 }
 
+
+
 export async function createUser(email: string, password: string) {
   const salt = genSaltSync(10);
   const hash = hashSync(password, salt);
@@ -79,6 +81,8 @@ export async function saveChat({
     throw error;
   }
 }
+
+
 
 export async function deleteChatById({ id }: { id: string }) {
   try {
