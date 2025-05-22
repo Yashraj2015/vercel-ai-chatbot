@@ -15,7 +15,7 @@ import {
 } from 'react';
 import { toast } from 'sonner';
 import { useLocalStorage, useWindowSize } from 'usehooks-ts';
-import { Mic } from 'lucide-react';
+import { Mic, Earth, Box, Paintbrush, Languages, AudioWaveform  } from 'lucide-react';
 import { ArrowUpIcon, PaperclipIcon, StopIcon } from './icons';
 import { PreviewAttachment } from './preview-attachment';
 import { Button } from './ui/button';
@@ -23,6 +23,7 @@ import { Textarea } from './ui/textarea';
 import { SuggestedActions } from './suggested-actions';
 import equal from 'fast-deep-equal';
 import type { UseChatHelpers } from '@ai-sdk/react';
+import Cookies from 'js-cookie';
 
 function PureMultimodalInput({
   chatId,
@@ -119,6 +120,8 @@ function PureMultimodalInput({
     }
   }, []);
 
+  
+
   const adjustHeight = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
@@ -132,6 +135,16 @@ function PureMultimodalInput({
       textareaRef.current.style.height = '98px';
     }
   };
+
+  const highlightMentions = (text: string) => {
+    return text
+      .replace(/(@Web Search)/g, '<span class="text-blue-400">$1</span>')
+      .replace(/(@Document)/g, '<span class="text-blue-400">$1</span>')
+      .replace(/(@Create Image)/g, '<span class="text-blue-400">$1</span>')
+      .replace(/\n/g, '<br/>')
+      .replace(/ {2}/g, '&nbsp;&nbsp;');
+  };
+  
 
   const [localStorageInput, setLocalStorageInput] = useLocalStorage(
     'input',
@@ -164,15 +177,20 @@ function PureMultimodalInput({
 
   const submitForm = useCallback(() => {
     window.history.replaceState({}, '', `/chat/${chatId}`);
-
+  
+    const modelFromCookie = Cookies.get('chat-model');
+    const modelSupportsAttachments = modelFromCookie !== 'chat-model1';
+  
     handleSubmit(undefined, {
-      experimental_attachments: attachments,
+      ...(modelSupportsAttachments && attachments.length > 0
+        ? { experimental_attachments: attachments }
+        : {}),
     });
-
+  
     setAttachments([]);
     setLocalStorageInput('');
     resetHeight();
-
+  
     if (width && width > 768) {
       textareaRef.current?.focus();
     }
@@ -238,6 +256,45 @@ function PureMultimodalInput({
     [setAttachments],
   );
 
+
+  const hasWebSearch = input.includes('@Web Search');
+
+  const hasDocument = input.includes('@Document');
+
+  const hasImage = input.includes('@Create Image');
+
+  const hasLangauge = input.includes('@Set Language to');
+  
+  const toggleMention = (tag: string) => {
+    const mention = `@${tag}`;
+    const regex = new RegExp(`\\s?${mention}`, 'g');
+  
+    if (input.includes(mention)) {
+      // Remove all instances of the mention (with optional preceding space)
+      setInput((prev) => prev.replace(regex, '').trim());
+    } else {
+      // Prepend the mention at the start, separated by a space if needed
+      setInput((prev) => `${mention} ${prev}`.trim());
+    }
+  
+    textareaRef.current?.focus();
+  };
+
+  const handleRemove = (urlToRemove: string) => {
+    setAttachments(prev => prev.filter(att => att.url !== urlToRemove));
+  };
+
+
+  const modelFromCookie = Cookies.get('chat-model');
+
+  const modelsWithAttachmentSupport = ['chat-model1', 'chat-model-reasoning', 'chat-model-reasoning1'];
+
+  const modelsWithottools = ['chat-model-reasoning1'];
+  
+  // Determine if the model supports attachments
+  const modelSupportsAttachments = !modelsWithAttachmentSupport.includes(modelFromCookie);
+  const modelsWithottoolsdisable = !modelsWithottools.includes(modelFromCookie);
+
   return (
     <div className="relative w-full flex flex-col gap-4 mb-4 md:px-0 px-4">
       {messages.length === 0 &&
@@ -261,7 +318,7 @@ function PureMultimodalInput({
           className="flex flex-row gap-2 overflow-x-scroll items-end"
         >
           {attachments.map((attachment) => (
-            <PreviewAttachment key={attachment.url} attachment={attachment} />
+            <PreviewAttachment key={attachment.url} attachment={attachment} onRemove={handleRemove}/>
           ))}
 
           {uploadQueue.map((filename) => (
@@ -273,6 +330,7 @@ function PureMultimodalInput({
                 contentType: '',
               }}
               isUploading={true}
+              onRemove={handleRemove}
             />
           ))}
         </div>
@@ -308,7 +366,85 @@ function PureMultimodalInput({
       />
 
       <div className="absolute bottom-0 p-2 w-fit flex flex-row justify-start">
-        <AttachmentsButton fileInputRef={fileInputRef} status={status} />
+        {modelSupportsAttachments && (
+          <AttachmentsButton fileInputRef={fileInputRef} status={status} />
+        )}
+        
+        {/* <div className=''> */}
+          {modelsWithottoolsdisable && (
+          <Button
+            type="button"
+            data-testid="web-search-button"
+            className={cx(
+              "rounded-full p-2 h-fit px-2 md:px-3 ml-[0.40rem]",
+              {
+                "bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 hover:text-blue-400/100": hasWebSearch,
+                "dark:bg-zinc-500/50 hover:bg-zinc-500/90": !hasWebSearch,
+              }
+            )}
+            onClick={() => toggleMention('Web Search')}
+            variant="ghost"
+          >
+            <Earth/>
+            <span className="hidden sm:block text-xs ">Web Search</span>
+          </Button>
+          )}
+          
+          {modelsWithottoolsdisable && (
+          <Button
+            type="button"
+            data-testid="document-button"
+            className={cx(
+              "rounded-full p-2 h-fit px-2 md:px-3 ml-[0.40rem]",
+              {
+                "bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 hover:text-blue-400/100": hasDocument,
+                "dark:bg-zinc-500/50 hover:bg-zinc-500/90": !hasDocument,
+              }
+            )}
+            onClick={() => toggleMention('Document')}
+            variant="ghost"
+          >
+            <Box/>
+            <span className="hidden sm:block text-xs">Document</span>
+          </Button>
+          )}
+
+          {/* <Button
+            type="button"
+            data-testid="create-image-button"
+            className={cx(
+              "rounded-full p-2 h-fit px-2 md:px-3 ml-[0.40rem]",
+              {
+                "bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 hover:text-blue-400/100": hasImage,
+                "dark:bg-zinc-500/50 hover:bg-zinc-500/90": !hasImage,
+              }
+            )}
+            onClick={() => toggleMention('Create Image')}
+            variant="ghost"
+          >
+            <Paintbrush/>
+            <span className="hidden sm:block text-xs">Create Image</span>
+          </Button> */}
+
+          <Button
+            type="button"
+            data-testid="language-button"
+            className={cx(
+              "rounded-full p-2 h-fit px-2 md:px-3 ml-[0.40rem]",
+              {
+                "bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 hover:text-blue-400/100": hasLangauge,
+                "dark:bg-zinc-500/50 hover:bg-zinc-500/90": !hasLangauge,
+              }
+            )}
+            onClick={() => toggleMention('Set Language to')}
+            variant="ghost"
+          >
+            <Languages/>
+            <span className="hidden sm:block text-xs">Language</span>
+          </Button>
+
+        {/* </div> */}
+
       </div>
 
       <div className="absolute bottom-0 right-0 p-2 w-fit flex flex-row justify-end gap-2">
@@ -316,7 +452,7 @@ function PureMultimodalInput({
           <>
             <Button
               data-testid="mic-button"
-              className={`rounded-full p-2 h-fit  border dark:border-zinc-500 ${isRecording ? 'bg-red-500' : ''}`}
+              className={`rounded-full p-2 h-fit ${isRecording ? 'bg-red-500' : 'bg-zinc-500/50 hover:dark:bg-zinc-500/90'}`}
               onClick={(event) => {
                 event.preventDefault();
                 toggleRecording();
@@ -325,6 +461,7 @@ function PureMultimodalInput({
             >
               <Mic size={14} />
             </Button>
+            
             {status === 'submitted' ? (
               <StopButton stop={stop} setMessages={setMessages} />
             ) : (
@@ -336,9 +473,10 @@ function PureMultimodalInput({
             )}
           </>
         ) : (
+          <>
           <Button
             data-testid="mic-button"
-            className={`rounded-full md:mr-0 mr-4 p-2 h-fit border dark:border-zinc-500 ${isRecording ? 'bg-red-500' : ''}`}
+            className={`rounded-full md:mr-0 mr-4 p-2 h-fit dark:bg-zinc-500/50 hover:dark:bg-zinc-500/90 ${isRecording ? 'bg-red-500' : ''}`}
             onClick={(event) => {
               event.preventDefault();
               toggleRecording();
@@ -347,6 +485,21 @@ function PureMultimodalInput({
           >
             <Mic size={14} />
           </Button>
+          {/* <Button
+            data-testid="mic-button"
+            className={`rounded-full md:mr-0 mr-4 p-2 h-fit hover:text-black text-black dark:bg-white hover:dark:bg-zinc-100/90 ${isRecording ? 'bg-red-500' : ''}`}
+            onClick={(e) => {
+              e.preventDefault(); // Prevent form submission if inside a form
+              window.location.href = "http://localhost:3001";
+            }}
+            variant={isRecording ? 'destructive' : 'ghost'}
+          >
+            <AudioWaveform  size={14} />
+          </Button> */}
+          {status === 'submitted' ? (
+              <StopButton stop={stop} setMessages={setMessages} />
+            ) : ('')}
+          </>
         )}
       </div>
     </div>
@@ -374,7 +527,7 @@ function PureAttachmentsButton({
   return (
     <Button
       data-testid="attachments-button"
-      className="rounded-full border p-2 h-fit dark:border-zinc-500 hover:dark:bg-zinc-900/40 "
+      className="rounded-full p-2 h-fit dark:bg-zinc-500/50 hover:dark:bg-zinc-500/90 "
       onClick={(event) => {
         event.preventDefault();
         fileInputRef.current?.click();
@@ -399,7 +552,7 @@ function PureStopButton({
   return (
     <Button
       data-testid="stop-button"
-      className="rounded-full p-2 h-fit border dark:border-zinc-600"
+      className="rounded-full p-2 h-fit mr-4 md:mr-0 dark:bg-white"
       onClick={(event) => {
         event.preventDefault();
         stop();

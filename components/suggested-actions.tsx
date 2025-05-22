@@ -4,6 +4,8 @@ import { motion } from 'framer-motion';
 import { Button } from './ui/button';
 import { memo } from 'react';
 import { UseChatHelpers } from '@ai-sdk/react';
+import { CloudSun, Code, BookOpen } from 'lucide-react';
+
 
 interface SuggestedActionsProps {
   chatId: string;
@@ -13,20 +15,24 @@ interface SuggestedActionsProps {
 function PureSuggestedActions({ chatId, append }: SuggestedActionsProps) {
   const suggestedActions = [
     {
-      title: 'What is the weather',
+      icon: CloudSun,
+      title: 'Weather',
       label: 'in San Francisco?',
-      action: 'What is the weather in San Francisco?',
+      action: 'What is the weather in Banglore?',
     },
     {
-      title: 'Write code to',
-      label: `demonstrate djikstra's algorithm`,
-      action: `Write code to demonstrate djikstra's algorithm`,
-    },
-    {
-      title: 'Help me write an essay',
+      icon: BookOpen,
+      title: 'Essay',
       label: `about silicon valley`,
-      action: `Help me write an essay about silicon valley`,
+      action: `Help me write an essay about silicon valley of India`,
     },
+    {
+      icon: Code,
+      title: 'Code',
+      label: `demonstrate djikstra's algorithm`,
+      action: `Write code for Tic Tac Toe game`,
+    },
+    
     
   ];
 
@@ -56,7 +62,10 @@ function PureSuggestedActions({ chatId, append }: SuggestedActionsProps) {
             }}
             className="text-left border rounded-2xl md:mx-20 px-3 py-3.5 text-sm flex-1 bg-zinc-600/20 gap-1 sm:flex-col  w-full h-auto justify-start items-start hover:bg-zinc-700/20"
           >
-            <span className="font-medium truncate">{suggestedAction.title}</span>
+            <div className='flex flex-row gap-2'>
+              <suggestedAction.icon className="w-12 h-12 text-zinc-400 mt-[0.10rem]" />
+              <span className="font-medium truncate">{suggestedAction.title}</span>
+            </div>
   
           </Button>
         </motion.div>

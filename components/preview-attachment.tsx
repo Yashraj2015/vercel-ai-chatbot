@@ -1,13 +1,16 @@
 import type { Attachment } from 'ai';
-
+import { useState } from 'react';
 import { LoaderIcon } from './icons';
+import { X } from 'lucide-react'; // X icon from lucide-react
 
 export const PreviewAttachment = ({
   attachment,
   isUploading = false,
+  onRemove,
 }: {
   attachment: Attachment;
   isUploading?: boolean;
+  onRemove: (url: string) => void;
 }) => {
   const { name, url, contentType } = attachment;
 
@@ -22,7 +25,7 @@ export const PreviewAttachment = ({
               key={url}
               src={url}
               alt={name ?? 'An image attachment'}
-              className="rounded-xl size-full object-cover"
+              className="rounded-xl size-full object-cover z-0"
             />
           ) : (
             <div className="text-xs text-zinc-500 max-w-16 truncate">{name}</div>
@@ -30,6 +33,15 @@ export const PreviewAttachment = ({
         ) : (
           <div className="" />
         )}
+
+        <button
+          type="button"
+          className="absolute bottom-1 z-1 right-1 bg-black/100 text-white rounded-md p-1 opacity-100 group-hover:opacity-100 transition-opacity"
+          onClick={() => onRemove(url)}
+          aria-label="Remove image"
+        >
+          <X width={10} height={10}/>
+        </button>
 
         {isUploading && (
           <div

@@ -67,7 +67,24 @@ export default function Page() {
             >
               Sign up
             </Link>
-            {' for free.'}
+            {''}
+          </p>
+          <p className="text-center text-xs text-gray-600 mt-4 dark:text-zinc-400">
+            {`By signing in, you agree to Srushti's`}
+            <br/>
+            <Link
+              href="/login"
+              className="font-semibold text-gray-800 hover:underline dark:text-zinc-200"
+            >
+              Terms
+            </Link>
+            {' and'}
+            <Link
+              href="/login"
+              className="font-semibold text-gray-800 hover:underline dark:text-zinc-200"
+            >
+              &nbsp;Privacy Policy
+            </Link>
           </p>
         </AuthForm>
       </div>

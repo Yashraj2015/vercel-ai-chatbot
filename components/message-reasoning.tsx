@@ -35,7 +35,7 @@ export function MessageReasoning({
     <div className="flex flex-col">
       {isLoading ? (
         <div className="flex flex-row gap-2 items-center">
-          <div className="font-medium">Reasoning</div>
+          <div className="font-medium">Thinking</div>
           <div className="animate-spin">
             <LoaderIcon />
           </div>

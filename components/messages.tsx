@@ -27,13 +27,11 @@ function PureMessages({
   reload,
   isReadonly,
 }: MessagesProps) {
-  const [messagesContainerRef, messagesEndRef] =
-    useScrollToBottom<HTMLDivElement>();
+  const [messagesContainerRef, messagesEndRef] = useScrollToBottom<HTMLDivElement>();
 
   return (
     <div
-      ref={messagesContainerRef}
-      className="flex flex-col min-w-0 gap-6 flex-1 overflow-y-scroll pt-0 "
+      className="flex flex-col min-w-0 gap-6 flex-1 overflow-y-scroll overflow-x-hidden pt-0 text-wrap"
     >
       {messages.length === 0 && <Greeting />}
 
@@ -59,7 +57,6 @@ function PureMessages({
         messages[messages.length - 1].role === 'user' && <ThinkingMessage />}
 
       <div
-        ref={messagesEndRef}
         className="shrink-0 min-w-[24px] min-h-[24px] "
       />
     </div>

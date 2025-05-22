@@ -24,7 +24,7 @@ import { updateDocument } from '@/lib/ai/tools/update-document';
 import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
 import { getWeather } from '@/lib/ai/tools/get-weather';
 import { isProductionEnvironment } from '@/lib/constants';
-import { myProvider } from '@/lib/ai/providers';
+import { myProvider } from '@/lib/ai/providers copy';
 import { generateText, tool } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
@@ -116,7 +116,11 @@ export async function POST(request: Request) {
           experimental_activeTools:
             selectedChatModel === 'chat-model-reasoning'
               ? [
-
+                  'getWeather',
+                  'createDocument',
+                  'updateDocument',
+                  'webSearch',
+                  'requestSuggestions',
                 ]
               : [
                   'getWeather',

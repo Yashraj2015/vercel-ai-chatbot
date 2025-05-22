@@ -90,8 +90,7 @@ export const textArtifact = new Artifact<'text', TextArtifactMetadata>({
             onSaveContent={onSaveContent}
           />
 
-          {metadata &&
-          metadata.suggestions &&
+          {metadata?.suggestions &&
           metadata.suggestions.length > 0 ? (
             <div className="md:hidden h-dvh w-12 shrink-0" />
           ) : null}
@@ -152,27 +151,27 @@ export const textArtifact = new Artifact<'text', TextArtifactMetadata>({
     },
   ],
   toolbar: [
-    {
-      icon: <PenIcon />,
-      description: 'Add final polish',
-      onClick: ({ appendMessage }) => {
-        appendMessage({
-          role: 'user',
-          content:
-            'Please add final polish and check for grammar, add section titles for better structure, and ensure everything reads smoothly.',
-        });
-      },
-    },
-    {
-      icon: <MessageIcon />,
-      description: 'Request suggestions',
-      onClick: ({ appendMessage }) => {
-        appendMessage({
-          role: 'user',
-          content:
-            'Please add suggestions you have that could improve the writing.',
-        });
-      },
-    },
+    // {
+    //   icon: <PenIcon />,
+    //   description: 'Add final polish',
+    //   onClick: ({ appendMessage }) => {
+    //     appendMessage({
+    //       role: 'user',
+    //       content:
+    //         '@Polish Please add final polish and check for grammar, add section titles for better structure, and ensure everything reads smoothly.',
+    //     });
+    //   },
+    // },
+    // {
+    //   icon: <MessageIcon />,
+    //   description: 'Request suggestions',
+    //   onClick: ({ appendMessage }) => {
+    //     appendMessage({
+    //       role: 'user',
+    //       content:
+    //         '@Suggest Please add suggestions you have that could improve the writing.',
+    //     });
+    //   },
+    // },
   ],
 });

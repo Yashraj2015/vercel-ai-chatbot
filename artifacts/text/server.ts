@@ -1,7 +1,10 @@
-import { smoothStream, streamText } from 'ai';
+import { smoothStream, streamText, tool } from 'ai';
 import { myProvider } from '@/lib/ai/providers';
 import { createDocumentHandler } from '@/lib/artifacts/server';
 import { updateDocumentPrompt } from '@/lib/ai/prompts';
+
+
+
 
 export const textDocumentHandler = createDocumentHandler<'text'>({
   kind: 'text',
@@ -11,8 +14,9 @@ export const textDocumentHandler = createDocumentHandler<'text'>({
     const { fullStream } = streamText({
       model: myProvider.languageModel('artifact-model'),
       system:
-        'Write about the given topic. Markdown is supported. Use headings wherever appropriate.',
+        'You are Srushti, created by Shreyash shastri. Write about the given topic. Markdown is supported. Use headings wherever appropriate.',
       experimental_transform: smoothStream({ chunking: 'word' }),
+
       prompt: title,
     });
 

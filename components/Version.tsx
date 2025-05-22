@@ -8,10 +8,10 @@ export const Version = () => {
           <Tooltip>
             <TooltipTrigger asChild >
               <div className=''>
-                v1.0.0-alpha
+                v1.0.0-beta
               </div>
             </TooltipTrigger>
-            <TooltipContent>Web app currently in alpha mode,&nbsp;&nbsp;may contain bugs and errors</TooltipContent>
+            <TooltipContent>Web app currently in beta mode,&nbsp;&nbsp;may contain bugs and errors</TooltipContent>
           </Tooltip>
     </div>
   )

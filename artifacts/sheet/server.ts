@@ -10,7 +10,7 @@ export const sheetDocumentHandler = createDocumentHandler<'sheet'>({
     let draftContent = '';
 
     const { fullStream } = streamObject({
-      model: myProvider.languageModel('artifact-model'),
+      model: myProvider.languageModel('chat-model'),
       system: sheetPrompt,
       prompt: title,
       schema: z.object({

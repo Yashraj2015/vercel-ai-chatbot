@@ -36,7 +36,7 @@ export const VersionFooter = ({
 
   return (
     <motion.div
-      className="absolute flex flex-col gap-4 lg:flex-row bottom-0 bg-background p-4 w-full border-t z-50 justify-between"
+      className="absolute flex flex-col gap-4 lg:flex-row bottom-0 bg-[#171718] rounded-t-3xl p-4 w-full border-t z-50 justify-between"
       initial={{ y: isMobile ? 200 : 77 }}
       animate={{ y: 0 }}
       exit={{ y: isMobile ? 200 : 77 }}
@@ -52,6 +52,7 @@ export const VersionFooter = ({
       <div className="flex flex-row gap-4">
         <Button
           disabled={isMutating}
+          className='rounded-xl'
           onClick={async () => {
             setIsMutating(true);
 
@@ -94,7 +95,7 @@ export const VersionFooter = ({
           )}
         </Button>
         <Button
-          variant="outline"
+          className='rounded-xl'
           onClick={() => {
             handleVersionChange('latest');
           }}
