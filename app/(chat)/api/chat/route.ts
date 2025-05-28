@@ -32,9 +32,9 @@ import { Exa } from 'exa-js';
 
 export const maxDuration = 60;
 
-export const exa = new Exa('e53f9eba-d9c8-458f-919b-4a57c54efd1d');
+const exa = new Exa('e53f9eba-d9c8-458f-919b-4a57c54efd1d');
 
-export const webSearch = tool({
+const webSearch = tool({
   description:
     'Search the web for up-to-date information, dont do it more then once, always choose the latest published page',
   parameters: z.object({
