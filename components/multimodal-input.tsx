@@ -25,6 +25,14 @@ import equal from 'fast-deep-equal';
 import type { UseChatHelpers } from '@ai-sdk/react';
 import Cookies from 'js-cookie';
 
+// Extend the Window interface to include SpeechRecognition types
+declare global {
+  interface Window {
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
+  }
+}
+
 function PureMultimodalInput({
   chatId,
   input,
@@ -55,7 +63,12 @@ function PureMultimodalInput({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
   const [isRecording, setIsRecording] = useState(false);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  // Add type declaration for SpeechRecognition if not present
+  type SpeechRecognitionType = typeof window extends { webkitSpeechRecognition: infer T }
+    ? T
+    : any;
+  
+  const recognitionRef = useRef<InstanceType<SpeechRecognitionType> | null>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -66,19 +79,23 @@ function PureMultimodalInput({
         recognition.interimResults = true;
         recognition.lang = 'en-US';
 
-        recognition.onresult = (event) => {
-          const transcript = Array.from(event.results)
-            .map((result) => result[0])
-            .map((result) => result.transcript)
+        interface SpeechRecognitionEventWithResults extends Event {
+          results: SpeechRecognitionResultList;
+        }
+
+        recognition.onresult = (event: SpeechRecognitionEventWithResults) => {
+          const transcript = Array.from(event.results as SpeechRecognitionResultList)
+            .map((result: SpeechRecognitionResult) => result[0])
+            .map((result: SpeechRecognitionAlternative) => result.transcript)
             .join('');
           setInput(transcript);
           adjustHeight();
         };
 
-        recognition.onerror = (event) => {
+        recognition.onerror = (event: { error: string }) => {
           console.error('Speech recognition error', event.error);
           setIsRecording(false);
-          toast.error('Speech recognition error: ' + event.error);
+          toast.error(`Speech recognition error: ${event.error}`);
         };
 
         recognitionRef.current = recognition;
@@ -292,8 +309,8 @@ function PureMultimodalInput({
   const modelsWithottools = ['chat-model-reasoning1'];
   
   // Determine if the model supports attachments
-  const modelSupportsAttachments = !modelsWithAttachmentSupport.includes(modelFromCookie);
-  const modelsWithottoolsdisable = !modelsWithottools.includes(modelFromCookie);
+  const modelSupportsAttachments = !modelsWithAttachmentSupport.includes(modelFromCookie ?? '');
+  const modelsWithottoolsdisable = !modelsWithottools.includes(modelFromCookie ?? '');
 
   return (
     <div className="relative w-full flex flex-col gap-4 mb-4 md:px-0 px-4">

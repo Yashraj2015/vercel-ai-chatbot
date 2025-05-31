@@ -80,6 +80,7 @@ const PurePreviewMessage = ({
                   <PreviewAttachment
                     key={attachment.url}
                     attachment={attachment}
+                    onRemove={() => {}}
                   />
                 ))}
               </div>
