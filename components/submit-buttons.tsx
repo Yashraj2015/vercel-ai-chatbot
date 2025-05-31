@@ -22,7 +22,7 @@ export function SubmitButton({
       type={pending ? 'button' : 'submit'}
       aria-disabled={pending || isSuccessful || disabled} // Include disabled in aria
       disabled={pending || isSuccessful || disabled} // Include disabled in button state
-      className="relative mr-0"
+      className="relative rounded-xl mt-4 bg-zinc-100"
     >
       {children}
 
