@@ -88,7 +88,7 @@ export default function Page() {
             <ReCAPTCHA
               className='mt-3 ml-1'
               ref={recaptchaRef}
-              sitekey={"6LfpdykrAAAAAGA9gsZ52r0ixav9gT8cSdTZ49hN"}
+              sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? ''}
               onChange={handleRecaptchaChange}
               onExpired={() => {
                 setRecaptchaToken(null);
